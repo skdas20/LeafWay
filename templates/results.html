@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeafWay - Prediction Results</title>
+    <link rel="icon" href="/static/leaf.png" type="image/png">
+    <style>
+      @import url(https://fonts.googleapis.com/css2?family=Lato&display=swap);
+      @import url(https://fonts.googleapis.com/css2?family=Open+Sans&display=swap);
+      @import url(https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200);
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Using the same Tailwind config as index.html for consistency
+      tailwind.config = {
+        content: ["./templates/**/*.{html,js}"], // Point to templates dir
+        theme: {"name":"Custom","fontFamily":{"sans":["Open Sans","ui-sans-serif","system-ui","sans-serif","\"Apple Color Emoji\"","\"Segoe UI Emoji\"","\"Segoe UI Symbol\"","\"Noto Color Emoji\""]},"extend":{"fontFamily":{"title":["Lato","ui-sans-serif","system-ui","sans-serif","\"Apple Color Emoji\"","\"Segoe UI Emoji\"","\"Segoe UI Symbol\"","\"Noto Color Emoji\""],"body":["Open Sans","ui-sans-serif","system-ui","sans-serif","\"Apple Color Emoji\"","\"Segoe UI Emoji\"","\"Segoe UI Symbol\"","\"Noto Color Emoji\""]},"colors":{"neutral":{"50":"#f7f7f7","100":"#eeeeee","200":"#e0e0e0","300":"#cacaca","400":"#b1b1b1","500":"#999999","600":"#7f7f7f","700":"#676767","800":"#545454","900":"#464646","950":"#282828"},"primary":{"50":"#f9f7f7","100":"#f1efef","200":"#e7e1e1","300":"#dad2d2","400":"#bcadad","500":"#a29191","600":"#8a7878","700":"#736262","800":"#615353","900":"#534949","950":"#2b2424","DEFAULT":"#dad2d2"}}},"fontSize":{"xs":["12px",{"lineHeight":"19.200000000000003px"}],"sm":["14px",{"lineHeight":"21px"}],"base":["16px",{"lineHeight":"25.6px"}],"lg":["18px",{"lineHeight":"27px"}],"xl":["20px",{"lineHeight":"28px"}],"2xl":["24px",{"lineHeight":"31.200000000000003px"}],"3xl":["30px",{"lineHeight":"36px"}],"4xl":["36px",{"lineHeight":"41.4px"}],"5xl":["48px",{"lineHeight":"52.800000000000004px"}],"6xl":["60px",{"lineHeight":"66px"}],"7xl":["72px",{"lineHeight":"75.60000000000001px"}],"8xl":["96px",{"lineHeight":"100.80000000000001px"}],"9xl":["128px",{"lineHeight":"134.4px"}]},"borderRadius":{"none":"0px","sm":"6px","DEFAULT":"12px","md":"18px","lg":"24px","xl":"36px","2xl":"48px","3xl":"72px","full":"9999px"},"spacing":{"0":"0px","1":"4px","2":"8px","3":"12px","4":"16px","5":"20px","6":"24px","7":"28px","8":"32px","9":"36px","10":"40px","11":"44px","12":"48px","14":"56px","16":"64px","20":"80px","24":"96px","28":"112px","32":"128px","36":"144px","40":"160px","44":"176px","48":"192px","52":"208px","56":"224px","60":"240px","64":"256px","72":"288px","80":"320px","96":"384px","px":"1px","0.5":"2px","1.5":"6px","2.5":"10px","3.5":"14px"}},
+        plugins: [],
+        important: '#webcrumbs-results' // Apply styles within this container
+      };
+    </script>
+    <style>
+        /* Simple loading indicator */
+        .loader {
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #8a7878; /* primary-600 */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Highlight the best option */
+        .best-option {
+            border: 2px solid #4ade80; /* green-400 */
+            background-color: #f0fdf4; /* green-50 */
+        }
+        .co2-low { color: #16a34a; } /* green-600 */
+        .co2-medium { color: #ca8a04; } /* yellow-600 */
+        .co2-high { color: #dc2626; } /* red-600 */
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="webcrumbs-results" class="w-full max-w-4xl mx-auto p-4 md:p-8">
+        <div class="bg-white rounded-xl overflow-hidden shadow-lg p-6 md:p-8 border border-gray-200">
+            <h1 class="text-3xl font-bold text-primary-800 mb-4 font-title text-center">Prediction Results</h1>
+
+            <div class="text-center mb-6 text-gray-600 font-body">
+                Based on your input:
+                <strong>{{ prediction.input_distance }} km</strong> distance,
+                <strong>{{ prediction.input_route }}</strong> route,
+                at <strong>{{ prediction.input_time }}</strong>.
+            </div>
+
+            {% if prediction and not prediction.error %}
+                <!-- Recommended Option -->
+                <div class="mb-8 p-6 rounded-lg best-option shadow">
+                    <h2 class="text-2xl font-semibold text-primary-700 mb-3 flex items-center">
+                        <span class="material-symbols-outlined mr-2 text-green-600">recommend</span> Recommended Mode: {{ prediction.predicted_mode }}
+                    </h2>
+                    <p class="text-lg text-gray-800 mb-2">
+                        Confidence: <span class="font-semibold">{{ (prediction.confidence * 100)|round }}%</span>
+                    </p>
+                    {% set predicted_co2 = prediction.emissions_by_mode.get(prediction.predicted_mode, 'N/A') %}
+                    <p class="text-lg text-gray-800">
+                        Estimated Total CO2 Emissions:
+                        <span class="font-semibold {% if predicted_co2 == 0 %}co2-low{% elif predicted_co2 != 'N/A' and predicted_co2 < 50 %}co2-low{% elif predicted_co2 != 'N/A' and predicted_co2 < 150 %}co2-medium{% else %}co2-high{% endif %}">
+                            {{ predicted_co2 }}g
+                        </span>
+                        {% if predicted_co2 != 'N/A' and predicted_co2 > 0 %}
+                            <span class="text-sm text-gray-500"> ({{ (predicted_co2 / prediction.input_distance)|round(1) }}g/km)</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- All Options Ranked -->
+                <h2 class="text-xl font-semibold text-primary-700 mb-4">All Transportation Options (Ranked by Likelihood):</h2>
+                <div class="space-y-3">
+                    {% for mode, prob in prediction.all_modes_ranked %}
+                        {% set co2 = prediction.emissions_by_mode.get(mode, 'N/A') %}
+                        <div class="p-4 border border-gray-200 rounded-md bg-gray-50 hover:shadow-sm transition-shadow">
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-lg text-primary-800">{{ loop.index }}. {{ mode }}</span>
+                                <span class="text-sm text-gray-600">Likelihood: {{ (prob * 100)|round }}%</span>
+                            </div>
+                            <div class="text-sm text-gray-700 mt-1">
+                                Estimated CO2:
+                                <span class="font-semibold {% if co2 == 0 %}co2-low{% elif co2 != 'N/A' and co2 < 50 %}co2-low{% elif co2 != 'N/A' and co2 < 150 %}co2-medium{% else %}co2-high{% endif %}">
+                                    {{ co2 }}g
+                                </span>
+                                {% if co2 != 'N/A' and co2 > 0 %}
+                                    <span class="text-xs text-gray-500"> ({{ (co2 / prediction.input_distance)|round(1) }}g/km)</span>
+                                {% elif co2 == 'N/A' %}
+                                    <span class="text-xs text-gray-500"> (CO2 data unavailable)</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+            {% elif prediction.error %}
+                <div class="text-center text-red-600 bg-red-100 p-4 rounded-md">
+                    <h2 class="text-xl font-semibold mb-2">Error</h2>
+                    <p>{{ prediction.error }}</p>
+                </div>
+            {% else %}
+                 <div class="text-center text-gray-500">
+                    <div class="loader"></div>
+                    <p>Loading results...</p>
+                 </div>
+            {% endif %}
+
+            <div class="mt-8 text-center">
+                <a href="{{ url_for('index') }}" class="inline-flex items-center px-6 py-2 border border-primary-600 text-primary-600 hover:bg-primary-50 rounded-lg font-semibold transition-all transform hover:translate-y-[-1px] hover:shadow-md">
+                    <span class="material-symbols-outlined mr-2">arrow_back</span> Try Another Prediction
+                </a>
+            </div>
+        </div>
+         <!-- Footer Section -->
+        <div class="text-center mt-6 text-sm text-gray-500">
+            Rishav kr. | Powered by Creativity
+        </div>
+    </div>
+</body>
+</html>

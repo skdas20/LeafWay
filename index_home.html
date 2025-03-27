@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeafWay</title>
+    <link rel="icon" href="/static/leaf.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f6df5;
+            --primary-dark: #3a56d4;
+            --text-color: #333333;
+            --text-color-light: #666666;
+            --background-color: #ffffff;
+            --background-alt: #f5f7ff;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        .dark-theme {
+            --primary-color: #6d8aff;
+            --primary-dark: #5575f7;
+            --text-color: #e1e1e1;
+            --text-color-light: #b0b0b0;
+            --background-color: #1a1a2e;
+            --background-alt: #242445;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: var(--transition);
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--background-alt);
+            padding: 20px 5%;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary-color);
+            transform: rotate(30deg);
+        }
+
+        /* Add a mobile theme toggle that's always visible */
+        .mobile-theme-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+            z-index: 1000;
+        }
+
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+        }
+
+        .hero-content {
+            width: 50%;
+            padding-right: 50px;
+        }
+
+        .hero-image {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        h1 span {
+            color: var(--primary-color);
+        }
+
+        p {
+            margin-bottom: 30px;
+            color: var(--text-color-light);
+            font-size: 1.1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            margin-right: 15px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .features {
+            padding: 80px 5%;
+            background-color: var(--background-alt);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--background-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        footer {
+            background-color: var(--background-alt);
+            padding: 30px 5%;
+            text-align: center;
+            color: var(--text-color-light);
+        }
+
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-content, .hero-image {
+                width: 100%;
+                padding: 0;
+                margin-bottom: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            /* Show mobile theme toggle on small screens */
+            .mobile-theme-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-leaf"></i>
+            <span>LeafWay</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
+    <!-- Mobile theme toggle button -->
+    <button id="mobile-theme-toggle" class="mobile-theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>LeafWay</h1>
+            <p>Make smarter, greener transportation choices with our advanced AI-powered prediction tool. Reduce your carbon footprint and contribute to a healthier planet!</p>
+            <a href="http://127.0.0.1:5000/input" class="btn">Get Started</a>
+        </div>
+        <div class="hero-image">
+            <img src="/static/Untitled_design.jpg" alt="Eco Transport">
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="section-title">
+            <h2>Key Features</h2>
+            <p>Discover how our tool can help you make eco-friendly transportation decisions</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Smart Predictions</h3>
+                <p>Our AI analyzes multiple factors to recommend the most eco-friendly transportation options for your journey.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-globe-americas"></i>
+                <h3>Reduce CO2 Emissions</h3>
+                <p>Get detailed insights about CO2 emissions for different transportation methods to make informed decisions.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-wallet"></i>
+                <h3>Save Money</h3>
+                <p>Eco-friendly options often lead to cost savings. Our tool helps you identify budget-friendly alternatives.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2023 LeafWay. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle functionality for both desktop and mobile
+        const themeToggle = document.getElementById('theme-toggle');
+        const mobileThemeToggle = document.getElementById('mobile-theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const mobileThemeIcon = mobileThemeToggle.querySelector('i');
+        
+        // Check for saved theme preference or use preference from OS
+        const savedTheme = localStorage.getItem('theme') || 
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        
+        // Apply the initial theme
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeIcon.classList.replace('fa-moon', 'fa-sun');
+            mobileThemeIcon.classList.replace('fa-moon', 'fa-sun');
+        }
+        
+        // Toggle theme functions
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            
+            // Update icons for both toggle buttons
+            const isDark = document.body.classList.contains('dark-theme');
+            
+            if (isDark) {
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                mobileThemeIcon.classList.replace('fa-moon', 'fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                mobileThemeIcon.classList.replace('fa-sun', 'fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Toggle theme when buttons are clicked
+        themeToggle.addEventListener('click', toggleTheme);
+        mobileThemeToggle.addEventListener('click', toggleTheme);
+    </script>
+</body>
+</html> 
