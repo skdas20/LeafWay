@@ -29,7 +29,7 @@ try:
 except FileNotFoundError:
     print(f"Error: Model file not found at {MODEL_PATH}")
     print("Please run the train_model.py script first to generate the model file.")
-    model = None # Set model to None if loading fails
+    model = None  # Set model to None if loading fails
 except Exception as e:
     print(f"Error loading model: {e}")
     model = None
@@ -45,7 +45,7 @@ except Exception as e:
     print(f"Warning: Could not load dataset {DATASET_PATH} to get dropdown values. Using defaults. Error: {e}")
     # Provide default values if dataset loading fails
     ROUTE_TYPES = ['Urban', 'Rural']
-    TIMES_OF_DAY = ['Morning', 'Afternoon', 'Evening', 'Night'] # Added Night just in case
+    TIMES_OF_DAY = ['Morning', 'Afternoon', 'Evening', 'Night']  # Added Night just in case
 
 # CO2 emissions mapping (from the original script)
 vehicle_to_co2 = {
@@ -89,11 +89,11 @@ def predict_transportation(distance, route_type, time_of_day):
         # Calculate CO2 emissions for all modes based on the input distance
         emissions_by_mode = {}
         for mode in vehicle_types:
-            co2_per_km = vehicle_to_co2.get(mode, -1) # Use .get for safety, default to -1 if mode not in dict
+            co2_per_km = vehicle_to_co2.get(mode, -1)  # Use .get for safety, default to -1 if mode not in dict
             if co2_per_km != -1:
                 emissions_by_mode[mode] = round(co2_per_km * float(distance), 2)
             else:
-                emissions_by_mode[mode] = 'N/A' # Indicate if CO2 data is missing
+                emissions_by_mode[mode] = 'N/A'  # Indicate if CO2 data is missing
 
         # Prepare the result dictionary
         result = {
@@ -111,7 +111,6 @@ def predict_transportation(distance, route_type, time_of_day):
         print(f"Error during prediction: {e}")
         return {"error": f"Prediction failed. Error: {e}"}
 
-
 @app.route('/', methods=['GET'])
 def landing_page():
     """Serves the landing page."""
@@ -121,27 +120,23 @@ def landing_page():
         print(f"Warning: Could not render landing page. Error: {e}")
         return render_template('start.html')
 
-
 @app.route('/start', methods=['GET'])
 def start_page():
     """Renders the start page as a fallback."""
     return render_template('start.html')
 
-
 @app.route('/input', methods=['GET'])
 def index():
     """Renders the input form page."""
     if model is None:
-         # Optionally render an error page or message if model isn't loaded
-         return "Error: Model could not be loaded. Please check the server logs.", 500
+        return "Error: Model could not be loaded. Please check the server logs.", 500
     return render_template('index.html', route_types=ROUTE_TYPES, times_of_day=TIMES_OF_DAY)
-
 
 @app.route('/predict', methods=['POST'])
 def predict():
     """Handles the form submission and displays prediction results."""
     if model is None:
-         return "Error: Model could not be loaded. Please check the server logs.", 500
+        return "Error: Model could not be loaded. Please check the server logs.", 500
 
     try:
         # Get data from form
@@ -155,7 +150,7 @@ def predict():
         try:
             dist_float = float(distance)
             if dist_float <= 0:
-                 raise ValueError("Distance must be positive.")
+                raise ValueError("Distance must be positive.")
         except ValueError:
             return "Error: Distance must be a positive number.", 400
 
@@ -163,7 +158,7 @@ def predict():
         prediction_result = predict_transportation(dist_float, route_type, time_of_day)
 
         if "error" in prediction_result:
-             return f"Error during prediction: {prediction_result['error']}", 500
+            return f"Error during prediction: {prediction_result['error']}", 500
 
         # Render the results page
         return render_template('results.html', prediction=prediction_result)
@@ -172,16 +167,14 @@ def predict():
         print(f"Error in /predict route: {e}")
         return f"An unexpected error occurred: {e}", 500
 
-
-# For local development
+# --- Deployment Configuration ---
 if __name__ == '__main__':
-    # Check if model is loaded before running
+    # Get PORT from environment (for Render)
+    port = int(os.getenv("PORT", 10000))  # Default to 10000 if not set
     if model is None:
         print("CRITICAL ERROR: Model is not loaded. Flask app cannot start.")
     else:
         print("Starting Flask server...")
-        # Use host='0.0.0.0' to make it accessible on the network if needed
-        # debug=True is useful for development but should be False in production
-        app.run(debug=True)
+        app.run(host="0.0.0.0", port=port)  # Needed for deployment
 
-# For Vercel deployment - The app object is used directly
+# For Render deployment - The app object is used directly
