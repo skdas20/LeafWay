@@ -1,8 +1,22 @@
 from flask import Flask, request, render_template, url_for, jsonify
 import os
+import sys
+
+# Add the current directory to the system path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Initialize Flask app
 app = Flask(__name__, static_folder='static')
+
+# For Vercel deployment - this is used to confirm the app is working
+@app.route('/api/python-version', methods=['GET'])
+def python_version():
+    """Returns the Python version being used"""
+    return jsonify({
+        "python_version": sys.version,
+        "path": sys.path,
+        "environment": {k: v for k, v in os.environ.items() if k.startswith('VERCEL') or k.startswith('PYTHON')}
+    })
 
 # Disable caching for static files
 @app.after_request
@@ -88,17 +102,23 @@ def landing_page():
         return render_template('index_home.html')
     except Exception as e:
         print(f"Warning: Could not render landing page. Error: {e}")
-        return render_template('start.html')
+        return f"Welcome to LeafWay! <a href='/api/health'>Check API Status</a>"
 
 @app.route('/start', methods=['GET'])
 def start_page():
     """Renders the start page as a fallback."""
-    return render_template('start.html')
+    try:
+        return render_template('start.html')
+    except Exception as e:
+        return f"LeafWay start page. <a href='/api/health'>Check API Status</a>"
 
 @app.route('/input', methods=['GET'])
 def index():
     """Renders the input form page."""
-    return render_template('index.html', route_types=ROUTE_TYPES, times_of_day=TIMES_OF_DAY)
+    try:
+        return render_template('index.html', route_types=ROUTE_TYPES, times_of_day=TIMES_OF_DAY)
+    except Exception as e:
+        return "Input form unavailable. Please check API status at <a href='/api/health'>API Status</a>"
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -123,7 +143,11 @@ def predict():
         prediction_result = predict_eco_transport(dist_float, route_type, time_of_day)
         
         # Render the results page
-        return render_template('results.html', prediction=prediction_result)
+        try:
+            return render_template('results.html', prediction=prediction_result)
+        except Exception as template_error:
+            # Fallback to JSON if template not available
+            return jsonify(prediction_result)
 
     except Exception as e:
         print(f"Error in /predict route: {e}")
@@ -132,7 +156,18 @@ def predict():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Simple health check endpoint"""
-    return jsonify({"status": "ok", "message": "LeafWay API is running"}), 200
+    return jsonify({
+        "status": "ok", 
+        "message": "LeafWay API is running",
+        "routes": {
+            "landing_page": "/",
+            "start_page": "/start",
+            "input_form": "/input",
+            "prediction": "/predict (POST)",
+            "health_check": "/api/health",
+            "python_version": "/api/python-version"
+        }
+    }), 200
 
 # For local development
 if __name__ == '__main__':
