@@ -8,11 +8,11 @@
     }
   ],
   "routes": [
-    { "src": "/static/(.*)", "dest": "/static/$1" },
-    { "src": "/", "dest": "/templates/index.html" },
-    { "src": "/start", "dest": "/templates/start.html" },
-    { "src": "/results", "dest": "/templates/results.html" },
-    { "src": "/index_home", "dest": "/templates/index_home.html" },
+    { "src": "/static/(.*)", "dest": "static/$1" },
+    { "src": "/", "dest": "templates/index.html" },
+    { "src": "/start", "dest": "templates/start.html" },
+    { "src": "/results", "dest": "templates/results.html" },
+    { "src": "/index_home", "dest": "templates/index_home.html" },
     { "src": "/api/(.*)", "dest": "/api/index.py" }
   ]
 }
