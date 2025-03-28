@@ -16,9 +16,9 @@ def add_header(response):
     return response
 
 # --- Configuration ---
-MODEL_PATH = 'eco_predictor_model.joblib'
-DATASET_PATH = 'vehicle_data.csv' # Needed to get unique values for dropdowns
-EXTERNAL_LANDING_PAGE = 'index_home.html'  # Use the local copy instead of external path
+MODEL_PATH = 'models/eco_predictor_model.joblib'
+DATASET_PATH = 'models/vehicle_data.csv'
+EXTERNAL_LANDING_PAGE = 'templates/index_home.html'
 # --------------------
 
 # Load the trained model pipeline
@@ -115,13 +115,10 @@ def predict_transportation(distance, route_type, time_of_day):
 @app.route('/', methods=['GET'])
 def landing_page():
     """Serves the landing page."""
-    if os.path.exists(EXTERNAL_LANDING_PAGE):
-        with open(EXTERNAL_LANDING_PAGE, 'r') as file:
-            content = file.read()
-        return content
-    else:
-        # Fallback to the start page if landing page doesn't exist
-        print(f"Warning: Landing page not found at {EXTERNAL_LANDING_PAGE}. Using start.html instead.")
+    try:
+        return render_template('index_home.html')
+    except Exception as e:
+        print(f"Warning: Could not render landing page. Error: {e}")
         return render_template('start.html')
 
 
@@ -176,6 +173,7 @@ def predict():
         return f"An unexpected error occurred: {e}", 500
 
 
+# For local development
 if __name__ == '__main__':
     # Check if model is loaded before running
     if model is None:
@@ -185,3 +183,6 @@ if __name__ == '__main__':
         # Use host='0.0.0.0' to make it accessible on the network if needed
         # debug=True is useful for development but should be False in production
         app.run(debug=True)
+
+# This is for Vercel deployment - Vercel uses the app object directly
+# No need to call app.run() as Vercel handles that
