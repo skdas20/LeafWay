@@ -1,7 +1,7 @@
 Flask>=2.0.1,<2.1.0
 scikit-learn>=1.3.0
 pandas>=1.3.5,<1.4.0
-numpy>=1.21.6,<1.22.0
+numpy>=1.21.6,<1.26  # Broader range for compatibility
 joblib>=1.1.0,<1.2.0
 gunicorn>=20.1.0,<20.2.0
 Werkzeug>=2.0.2,<2.1.0
