@@ -184,5 +184,4 @@ if __name__ == '__main__':
         # debug=True is useful for development but should be False in production
         app.run(debug=True)
 
-# This is for Vercel deployment - Vercel uses the app object directly
-# No need to call app.run() as Vercel handles that
+# For Vercel deployment - The app object is used directly
