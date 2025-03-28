@@ -1,0 +1,21 @@
+# Git files
+.git
+.gitignore
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo 
